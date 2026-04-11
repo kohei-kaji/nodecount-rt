@@ -1,0 +1,64 @@
+\documentclass{standalone}
+\usepackage{forest}
+\usepackage{tikz}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\forestset{
+  uniform node/.style={
+    shape=circle,
+    draw,
+    minimum size=10mm,
+    inner sep=0pt,
+    align=center,
+    font=\fontsize{10}{12}\selectfont
+  },
+  terminal node/.style={
+    shape=rectangle,
+    draw,
+    line width=1pt,
+    minimum width=12mm,
+    minimum height=8mm,
+    inner sep=2pt,
+    align=center,
+    font=\ttfamily\fontsize{10}{12}\selectfont
+  },
+  my tree/.style={
+    for tree={
+      uniform node,
+      if n children=0{terminal node}{},
+      s sep+=5pt
+    }
+  }
+}
+
+\begin{document}
+\normalsize
+
+\begin{tikzpicture}
+  \node[anchor=north west, font=\bfseries\fontsize{12}{14}\selectfont] at (0,4) {C};
+
+  \node at (3,0) {
+    \begin{forest} my tree
+      [S, fill=red!60
+        [NP, fill=red!60
+          [PRP\\We, draw=red, fill=white, label={[shift={(23pt,-6pt)}]center:{\textcolor{red}{\huge 2}}}]
+        ]
+        [VP, fill=cyan!70
+          [VP, fill=orange!70
+            [VBD\\solved, draw=orange, fill=white, label={[shift={(24pt,-6pt)}]center:{\textcolor{orange}{\huge 1}}}]
+            [NP, fill=green!70
+              [DT\\a, draw=green, fill=white, label={[shift={(23pt,-6pt)}]center:{\textcolor{green}{\huge 1}}}]
+              [NNP\\problem, draw=cyan, fill=white, label={[shift={(27pt,-6pt)}]center:{\textcolor{cyan}{\huge 1}}}]
+            ]
+          ]
+          [ADVP, fill=blue!60
+            [RB\\analytically, draw=blue, fill=white, label={[shift={(39pt,-6pt)}]center:{\textcolor{blue}{\huge 1}}}]
+          ]
+        ]
+      ]
+    \end{forest}
+  };
+\end{tikzpicture}
+
+\end{document}

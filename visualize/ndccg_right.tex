@@ -1,0 +1,28 @@
+\documentclass[border=2mm]{standalone}
+\usepackage{ccg,amsmath}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{etoolbox}
+
+\makeatletter
+\renewcommand{\rmdefault}{phv}
+\patchcmd{\deriv@text}{\rm}{\sffamily\fontsize{10}{12}\selectfont}{}{}
+\patchcmd{\deriv@cat}{\it}{\sffamily\fontsize{10}{12}\selectfont\itshape}{}{}
+\makeatother
+
+\begin{document}
+\normalsize
+\deriv{4}{
+    0 & 0 & 0 & 3 \\
+	\text{We} & \text{solved} & \text{a} & \text{problem} \\
+    \ul{1} & \ul{1} & \ul{1} & \ul{1} \\
+	\mc{1}{\it NP} & \mc{1}{\it (S{\bs}NP)/NP} & \mc{1}{\it NP/N} & \mc{1}{\it N} \\
+     & & \fapply{2} \\
+     & & \mc{2}{\it NP} \\
+     & \fapply{3} \\
+     & \mc{3}{\it S{\bs}NP} \\
+    \bapply{4} \\
+	\mc{4}{\it S}
+}
+
+\end{document}

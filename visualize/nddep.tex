@@ -1,0 +1,19 @@
+\documentclass[border=2mm]{standalone}
+\usepackage{tikz-dependency}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\begin{document}
+\normalsize
+
+\begin{dependency}[theme = simple]
+    \begin{deptext}[column sep=1em, font=\fontsize{10}{12}\selectfont]
+        We \& solved \& a \& problem \\
+        0 \& 1 \& 0 \& 2 \\
+    \end{deptext}
+    \depedge{2}{1}{nsubj}
+    \depedge{4}{3}{det}
+    \depedge{2}{4}{obj}
+\end{dependency}
+
+\end{document}
