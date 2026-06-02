@@ -190,11 +190,8 @@ def make_nodecount_data(input_path: str, output_path: str) -> None:
     itemnos: list[str] = []
 
     with open(input_path, "r") as f:
-        for i, line in enumerate(f):
-            if i == 0:
-                continue
-            else:
-                itemno, line = line.strip().split("\t")
+        for i, line in enumerate(f, start=1):
+            line = line.strip()
             assert (
                 sum(top_down_effort(line))
                 == sum(bottom_up_effort(line))
@@ -212,7 +209,7 @@ def make_nodecount_data(input_path: str, output_path: str) -> None:
                 for token in PTBReader(line).parse().tokens
             ]
             words += tokens
-            itemnos += [itemno] * len(tokens)
+            itemnos += [i] * len(tokens)
 
     assert (len(topdown) == len(bottomup) == len(leftcorner) == len(words) == len(itemnos))
     assert (sum(topdown) == sum(bottomup) == sum(leftcorner)), f"\n{sum(topdown)=}\n{sum(bottomup)=}\n{sum(leftcorner)=}"
@@ -236,3 +233,9 @@ def make_nodecount_data(input_path: str, output_path: str) -> None:
         )
         writer.writeheader()
         writer.writerows(rows)
+
+if __name__ == "__main__":
+    make_nodecount_data(
+        "./data/OneStop/benepar.txt",
+        "./data/os_cfg.tsv",
+    )

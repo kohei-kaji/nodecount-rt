@@ -133,10 +133,29 @@ rts_summary <- read_csv(rt_path, col_types = cols_only(subject = "c",article = "
 df_dt <- merge(rts_summary, pred, by = c("article","zone"), sort=F)
 
 
-df_os <- read_csv("../data/os_merged.csv", show_col_types = FALSE) %>% drop_na()
-df_os <- df_os %>%
-  filter(is_punct==0, bos==0, eos==0) %>%
-  select(-is_punct, -bos, -eos) %>%
+pred_path <- "../data/preds_os.csv"
+pred <- read_csv(pred_path,col_types = cols_only(wlen="d",unigram="d",surp_gpt2="d",dep_nc="d",topdown_nc="d",bottomup_nc="d",leftcorner_nc="d",ccgright_reduce="d",ccgleft_reduce="d",zone="d",position="d",article_batch="c",article_id="c",difficulty_level="c")) %>%
+  mutate(zone_id = zone, story = paste(article_batch,article_id,difficulty_level,sep="_")) %>%
+  select(-article_batch, -article_id, -difficulty_level)
+positions <- read_csv(pred_path,col_types = cols_only(zone="d",punc="d",line_start="d",line_end="d",article_batch="c",article_id="c",difficulty_level="c")) %>%
+  mutate(zone_id = zone, story = paste(article_batch, article_id, difficulty_level, sep="_")) %>%
+  select(-zone, -article_batch, -article_id, -difficulty_level)
+pred_so1 <- pred %>% 
+  mutate(zone_id = zone_id + 1) %>% 
+  select(-zone) %>%
+  rename_with(~ paste(., "_so1", sep = "")) %>%
+  rename(story = story_so1, zone_id = zone_id_so1)
+pred_so2 <- pred %>% 
+  mutate(zone_id = zone_id + 2) %>% 
+  select(-zone) %>% 
+  rename_with(~ paste(., "_so2", sep = "")) %>% 
+  rename(story = story_so2, zone_id = zone_id_so2)
+pred <- pred %>%
+  merge(pred_so1, by = c("story", "zone_id"), sort = F) %>%
+  merge(pred_so2, by = c("story", "zone_id"), sort = F) %>%
+  merge(positions, by = c("story", "zone_id"), sort = F) %>%
+  filter(punc==0, line_start==0, line_end==0) %>%
+  select(-punc, -line_start, -line_end) %>%
   mutate_at(
     vars(
       zone,position,
@@ -145,12 +164,56 @@ df_os <- df_os %>%
       wlen_so2,unigram_so2,surp_gpt2_so2,dep_nc_so2,topdown_nc_so2,bottomup_nc_so2,leftcorner_nc_so2,ccgright_reduce_so2,ccgleft_reduce_so2
     ),
     function(x) {scale(x, center=T, scale=T)})
-df_osfp <- df_os %>%
-  rename(mean_RT=mean_FPD)
-df_osgp <- df_os %>%
-  rename(mean_RT=mean_GPD)
-df_ost <- df_os %>%
-  rename(mean_RT=mean_TRT)
+
+rt_path <- "../data/OneStop/rts.csv"
+rts_summary <- read_csv(rt_path,col_types = cols_only(article_batch="c",article_id="c",difficulty_level="c",zone="d",IA_FIRST_RUN_DWELL_TIME="d"), na = c("", "NA", ".")) %>%
+  mutate(story = paste(article_batch, article_id, difficulty_level, sep="_")) %>%
+  select(story, zone, IA_FIRST_RUN_DWELL_TIME) %>%
+  drop_na(IA_FIRST_RUN_DWELL_TIME) %>%
+  filter(IA_FIRST_RUN_DWELL_TIME > 0, IA_FIRST_RUN_DWELL_TIME <= 2000) %>%
+  rename(zone_id=zone) %>%
+  group_by(story, zone_id) %>%
+  summarise(mean_RT = mean(IA_FIRST_RUN_DWELL_TIME, na.rm = TRUE), .groups = "drop")
+df_osfp <- merge(rts_summary, pred, by = c("story","zone_id"), sort=F)
+
+rts_summary <- read_csv(rt_path,col_types = cols_only(article_batch="c",article_id="c",difficulty_level="c",zone="d",IA_REGRESSION_PATH_DURATION="d"), na = c("", "NA", ".")) %>%
+  mutate(story = paste(article_batch, article_id, difficulty_level, sep="_")) %>%
+  select(story, zone, IA_REGRESSION_PATH_DURATION) %>%
+  drop_na(IA_REGRESSION_PATH_DURATION) %>%
+  filter(IA_REGRESSION_PATH_DURATION > 0, IA_REGRESSION_PATH_DURATION <= 2000) %>%
+  rename(zone_id=zone) %>%
+  group_by(story, zone_id) %>%
+  summarise(mean_RT = mean(IA_REGRESSION_PATH_DURATION, na.rm = TRUE), .groups = "drop")
+df_osgp <- merge(rts_summary, pred, by = c("story","zone_id"), sort=F)
+
+rts_summary <- read_csv(rt_path,col_types = cols_only(article_batch="c",article_id="c",difficulty_level="c",zone="d",IA_DWELL_TIME="d"), na = c("", "NA", ".")) %>%
+  mutate(story = paste(article_batch, article_id, difficulty_level, sep="_")) %>%
+  select(story, zone, IA_DWELL_TIME) %>%
+  drop_na(IA_DWELL_TIME) %>%
+  filter(IA_DWELL_TIME > 0, IA_DWELL_TIME <= 2000) %>%
+  rename(zone_id=zone) %>%
+  group_by(story, zone_id) %>%
+  summarise(mean_RT = mean(IA_DWELL_TIME, na.rm = TRUE), .groups = "drop")
+df_ost <- merge(rts_summary, pred, by = c("story","zone_id"), sort=F)
+
+# df_os <- read_csv("../data/os_merged.csv", show_col_types = FALSE) %>% drop_na()
+# df_os <- df_os %>%
+#   filter(is_punct==0, bos==0, eos==0) %>%
+#   select(-is_punct, -bos, -eos) %>%
+#   mutate_at(
+#     vars(
+#       zone,position,
+#       wlen,unigram,surp_gpt2,dep_nc,topdown_nc,bottomup_nc,leftcorner_nc,ccgright_reduce,ccgleft_reduce,
+#       wlen_so1,unigram_so1,surp_gpt2_so1,dep_nc_so1,topdown_nc_so1,bottomup_nc_so1,leftcorner_nc_so1,ccgright_reduce_so1,ccgleft_reduce_so1,
+#       wlen_so2,unigram_so2,surp_gpt2_so2,dep_nc_so2,topdown_nc_so2,bottomup_nc_so2,leftcorner_nc_so2,ccgright_reduce_so2,ccgleft_reduce_so2
+#     ),
+#     function(x) {scale(x, center=T, scale=T)})
+# df_osfp <- df_os %>%
+#   rename(mean_RT=mean_FPD)
+# df_osgp <- df_os %>%
+#   rename(mean_RT=mean_GPD)
+# df_ost <- df_os %>%
+#   rename(mean_RT=mean_TRT)
 
 
 df_ns$source <- "Natural Stories"
@@ -198,6 +261,8 @@ p <- ggplot(df_all_RT, aes(x = mean_RT, fill = source)) +
     text = element_text(size = 8, hjust = 0.5),
     axis.text.x = element_text(size = 8),
     axis.text.y = element_text(size = 8),
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_text(size = 10),
     panel.spacing = unit(0.1, "lines"),
     strip.text = element_text(face = "bold"),
     legend.position = "none"
@@ -270,12 +335,24 @@ pred_dundee <- read_csv("../data/preds_dundee.csv",
   mutate(across(where(is.numeric), ~ replace_na(.x, 0)))
 p2 <- make_corplot(pred_dundee, "Dundee")
 
-df_os <- read_csv("../data/os_merged.csv", show_col_types = FALSE) %>%
-  mutate(cpmi = unisurp - surp_gpt2) %>%
-  drop_na() %>%
-  filter(is_punct == 0, bos == 0, eos == 0) %>%
-  select(-is_punct, -bos, -eos)
-p3 <- make_corplot(df_os, "OneStop", TRUE)
+pred_os <- read_csv("../data/preds_os.csv",
+                    col_types = cols_only(zone="d", position="d", wlen="d", unigram="d",surp_gpt2="d",
+                                          dep_nc="d",topdown_nc="d",bottomup_nc="d",leftcorner_nc="d",
+                                          ccgright_reduce="d", ccgleft_reduce="d",
+                                          punc="d", line_start="d", line_end="d",
+                                          article_batch="c",article_id="c",difficulty_level="c")) %>%
+  mutate(story = paste(article_batch, article_id, difficulty_level, sep="_")) %>%
+  mutate(cpmi = unigram - surp_gpt2) %>%
+  rename(unisurp = unigram) %>%
+  filter(punc == 0, line_start == 0, line_end == 0) %>%
+  select(-punc, -line_start, -line_end)
+p3 <- make_corplot(pred_os, "OneStop", TRUE)
+# df_os <- read_csv("../data/os_merged.csv", show_col_types = FALSE) %>%
+#   mutate(cpmi = unisurp - surp_gpt2) %>%
+#   drop_na() %>%
+#   filter(is_punct == 0, bos == 0, eos == 0) %>%
+#   select(-is_punct, -bos, -eos)
+# p3 <- make_corplot(df_os, "OneStop", TRUE)
 
 combined_plot <- (p2 | p1 | p3) + 
   plot_layout(guides = "collect") & 
@@ -312,7 +389,7 @@ df_long <- bind_rows(
     transmute(dataset = "Dundee", cpmi, across(all_of(nc_cols), ~ .x)),
   pred_ns %>%
     transmute(dataset = "Natural Stories", cpmi, across(all_of(nc_cols), ~ .x)),
-  df_os %>%
+  pred_os %>%
     transmute(dataset = "OneStop", cpmi, across(all_of(nc_cols), ~ .x))
 ) %>%
   pivot_longer(
@@ -373,8 +450,8 @@ p_corr <- ggplot(df_long, aes(x = nodecount, y = cpmi)) +
     strip.text.y    = element_text(size = 8),
     strip.text.x    = element_text(size = 8),
     strip.placement = "outside",
-    axis.title.y    = element_text(size = 8),
-    axis.title.x    = element_text(size = 8),
+    axis.title.y    = element_text(size = 12),
+    axis.title.x    = element_text(size = 12),
     axis.text.x     = element_text(size = 6),
     axis.text.y     = element_text(size = 6),
     panel.spacing   = unit(0.1, "lines"),
@@ -411,10 +488,20 @@ rts_summary <- read_csv(rt_path, col_types = cols_only(subject = "c",article = "
   summarise(mean_RT = mean(FPRT, na.rm = TRUE), .groups = "drop")
 df_dfp <- merge(rts_summary, pred, by = c("article","zone"), sort=F)
 
-df_os <- read_csv("../data/os_merged.csv", show_col_types = FALSE) %>% drop_na()
-df_os <- df_os %>%
-  filter(is_punct==0, bos==0, eos==0) %>%
-  select(-is_punct, -bos, -eos)
+# df_os <- read_csv("../data/os_merged.csv", show_col_types = FALSE) %>% drop_na()
+# df_os <- df_os %>%
+#   filter(is_punct==0, bos==0, eos==0) %>%
+#   select(-is_punct, -bos, -eos)
+df_os <- read_csv("../data/preds_os.csv",
+                    col_types = cols_only(zone="d", position="d", wlen="d", unigram="d",surp_gpt2="d",
+                                          dep_nc="d",topdown_nc="d",bottomup_nc="d",leftcorner_nc="d",
+                                          ccgright_reduce="d", ccgleft_reduce="d",
+                                          punc="d", line_start="d", line_end="d",
+                                          article_batch="c",article_id="c",difficulty_level="c")) %>%
+  mutate(story = paste(article_batch, article_id, difficulty_level, sep="_")) %>%
+  mutate(cpmi = unigram - surp_gpt2) %>%
+  filter(punc == 0, line_start == 0, line_end == 0) %>%
+  select(-punc, -line_start, -line_end)
 
 
 # plot nodecount freqs
@@ -472,7 +559,7 @@ df_summary <- df_long %>%
 
 p <- ggplot(df_summary, aes(x = nc_bin)) +
   geom_col(aes(y = count, fill = predictor), width = 1) +
-  facet_grid(dataset ~ predictor, scales = "fixed") +
+  facet_grid(dataset ~ predictor, scales = "free_y") +
   scale_fill_manual(values = cols) +
   scale_y_continuous(
     name   = "# Words",
@@ -488,8 +575,8 @@ p <- ggplot(df_summary, aes(x = nc_bin)) +
     strip.text.y    = element_text(size = 8),
     strip.text.x    = element_text(size = 8),
     strip.placement = "outside",
-    axis.title.y    = element_text(size = 8),
-    axis.title.x    = element_text(size = 8),
+    axis.title.y    = element_text(size = 12),
+    axis.title.x    = element_text(size = 12),
     axis.text.x     = element_text(size = 6),
     axis.text.y     = element_text(size = 6),
     panel.spacing   = unit(0.1, "lines"),
@@ -559,7 +646,8 @@ p <- ggplot() +
   geom_errorbar(
     data = plot_df,
     aes(x = predictor_num, ymin = lower_ci, ymax = upper_ci, color = predictor),
-    width = 0.04
+    width = 0.04,
+    show.legend = FALSE
   ) +
   geom_text(
     data = plot_df,
@@ -573,14 +661,15 @@ p <- ggplot() +
                      minor_breaks = NULL) +
   facet_wrap(~ dataset, ncol = 7) +
   ylab("Delta Log Likelihood (average per word)") +
-  xlab("") +
   theme_bw() +
   theme(
     text = element_text(size = 8,  hjust = 0.5),
     legend.position = "bottom",
-    legend.text = element_text(size = 7),
+    legend.margin = margin(t = -10),
+    legend.text = element_text(size = 8),
     legend.title = element_blank(),
     axis.title.x = element_blank(),
+    axis.title.y = element_text(size = 10),
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank(),
     panel.spacing = unit(0.1, "lines"),
@@ -639,7 +728,6 @@ p2 <- ggplot(coeff_long_df, aes(x = type, y = coeff, fill = predictor)) +
   scale_fill_manual(values = cols, name = "") +
   guides(fill = guide_legend(title = "", nrow = 1)) +
   ylab("Coefficient Estimate") +
-  xlab("") +
   scale_x_discrete(
     labels = c("w[i]"   = TeX("$w_i$"),
                "w[i-1]" = TeX("$w_{i+1}$"),
@@ -650,10 +738,12 @@ p2 <- ggplot(coeff_long_df, aes(x = type, y = coeff, fill = predictor)) +
   theme(
     text = element_text(size = 7.8, hjust = 0.5),
     legend.position = "bottom",
-    legend.text = element_text(size = 7),
+    legend.margin = margin(t = -10),
+    legend.text = element_text(size = 8),
     legend.title = element_blank(),
     axis.title.x = element_blank(),
-    axis.text.x  = element_text(hjust = 1),
+    axis.title.y = element_text(size = 10),
+    axis.text.x  = element_text(hjust = 0.5, size = 8),
     axis.text.y  = element_text(size = 5),
     axis.ticks.length = unit(0.05, "cm"),
     axis.ticks.x = element_line(),
@@ -715,8 +805,8 @@ plot_df <- result_df %>%
       (dataset == "Dundee First pass" & predictor %in% c("PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
       (dataset == "Dundee Go-past" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
       (dataset == "Dundee Total fixation" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
-      (dataset == "OneStop First pass" & predictor %in% c("PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
-      (dataset == "OneStop Go-past" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "PSG Left-corner", "Dependency", "CCG-Right")) |
+      (dataset == "OneStop First pass" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
+      (dataset == "OneStop Go-past" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "PSG Left-corner","Dependency", "CCG-Right", "CCG-Left")) |
       (dataset == "OneStop Total fixation" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left"))
   ) %>%
   mutate(dataset = factor(dataset,
@@ -736,8 +826,8 @@ surp_df_subset <- surp_df %>%
       (dataset == "Dundee First pass" & predictor %in% c("PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
       (dataset == "Dundee Go-past" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
       (dataset == "Dundee Total fixation" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
-      (dataset == "OneStop First pass" & predictor %in% c("PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
-      (dataset == "OneStop Go-past" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "PSG Left-corner", "Dependency", "CCG-Right")) |
+      (dataset == "OneStop First pass" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left")) |
+      (dataset == "OneStop Go-past" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "PSG Left-corner","Dependency", "CCG-Right", "CCG-Left")) |
       (dataset == "OneStop Total fixation" & predictor %in% c("PSG Top-down", "PSG Bottom-up", "Dependency", "CCG-Right", "CCG-Left"))
   ) %>%
   mutate(
@@ -758,46 +848,36 @@ surp_df_subset <- surp_df_subset %>%
 
 p <- ggplot() +
   geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.5) +
-  
-  # Surprisal-controlled points (white fill)
-  geom_errorbar(data = surp_df_subset,
-                aes(x = x_plot, ymin = lower_ci, ymax = upper_ci, color = predictor),
-                width = 0.04) +
-  geom_point(data = surp_df_subset,
-             aes(x = x_plot, y = mean_dll, color = predictor),
-             shape = 21,
-             fill = "white",
-             size = 2.5) +
-  geom_text(data = surp_df_subset,
-            aes(x = x_plot, y = upper_ci + 0.00008, label = sig, color = predictor),
-            size = 4,
-            show.legend = FALSE) +
-
-  # Original model points (colored)
-  geom_point(data = plot_df,
-             aes(x = x_plot, y = mean_dll, color = predictor),
-             size = 2.5) +
-  geom_errorbar(data = plot_df,
-                aes(x = x_plot, ymin = lower_ci, ymax = upper_ci, color = predictor),
-                width = 0.04) +
-  geom_text(data = plot_df,
-            aes(x = x_plot, y = upper_ci + 0.00008, label = sig, color = predictor),
-            size = 4, show.legend = FALSE) +
-
+  geom_errorbar(data = surp_df_subset, aes(x = x_plot, ymin = lower_ci, ymax = upper_ci, color = predictor), width = 0.04, show.legend = FALSE) +
+  geom_point(data = surp_df_subset, aes(x = x_plot, y = mean_dll, color = predictor, shape = "w/ surprisal"), fill = "white", size = 2.5) +
+  geom_text(data = surp_df_subset, aes(x = x_plot, y = upper_ci + 0.00008, label = sig, color = predictor), size = 4, show.legend = FALSE) +
+  geom_point(data = plot_df, aes(x = x_plot, y = mean_dll, color = predictor, shape = "w/o surprisal"), size = 2.5) +
+  geom_errorbar(data = plot_df, aes(x = x_plot, ymin = lower_ci, ymax = upper_ci, color = predictor), width = 0.04, show.legend = FALSE) +
+  geom_text(data = plot_df, aes(x = x_plot, y = upper_ci + 0.00008, label = sig, color = predictor), size = 4, show.legend = FALSE) +
   scale_color_manual(values = cols, name = "") +
-  guides(color = guide_legend(title = "", nrow = 1)) +
-
+  scale_shape_manual(
+    values = c("w/o surprisal" = 19, "w/ surprisal" = 21),
+    breaks = c("w/o surprisal", "w/ surprisal"),
+    name = ""
+  ) +
+  guides(
+    color = guide_legend(title = "", nrow = 1, order = 1, override.aes = list(shape = 19)),
+    shape = guide_legend(title = "", nrow = 1, order = 2, override.aes = list(color = "black", fill = "white"))
+  ) +
   scale_x_continuous(breaks = 1:6 - 0.1, labels = predictor_levels, minor_breaks = NULL) +
   facet_wrap(~ dataset, ncol = 7) +
   ylab("Delta Log Likelihood (average per word)") +
-  xlab("") +
   theme_bw() +
   theme(
     text = element_text(size = 8,  hjust = 0.5),
     legend.position = "bottom",
-    legend.text = element_text(size=7),
+    legend.box = "vertical",
+    legend.margin = margin(t = -10),
+    legend.box.margin = margin(t = 0),
+    legend.text = element_text(size = 8),
     legend.title = element_blank(),
     axis.title.x = element_blank(),
+    axis.title.y = element_text(size = 10),
     axis.text.x = element_blank(),
     axis.ticks.x = element_blank(),
     panel.spacing = unit(0.1, "lines"),
@@ -907,7 +987,6 @@ p2 <- ggplot(plot_df_full,
   scale_fill_manual(values = cols, name = "") +
   guides(fill = guide_legend(title = "", nrow = 1)) +
   ylab("Coefficient Estimate") +
-  xlab("") +
   scale_x_discrete(
     labels = c("w[i]"   = TeX("$w_i$"),
                "w[i-1]" = TeX("$w_{i+1}$"),
@@ -918,10 +997,12 @@ p2 <- ggplot(plot_df_full,
   theme(
     text = element_text(size = 7.8, hjust = 0.5),
     legend.position = "bottom",
-    legend.text = element_text(size = 7),
+    legend.margin = margin(t = -10),
+    legend.text = element_text(size = 8),
     legend.title = element_blank(),
     axis.title.x = element_blank(),
-    axis.text.x  = element_text(hjust = 1),
+    axis.title.y = element_text(size = 10),
+    axis.text.x  = element_text(hjust = 0.5, size = 8),
     axis.text.y  = element_text(size = 5),
     axis.ticks.length = unit(0.05, "cm"),
     axis.ticks.x = element_line(),
@@ -1011,7 +1092,6 @@ p2 <- ggplot(coeff_long_df, aes(x = type, y = coeff)) +
     color    = "#00BFC4"
   ) +
   ylab("Coefficient Estimate") +
-  xlab("") +
   scale_x_discrete(
     labels = c(
       "w[i]"   = TeX("$w_i$"),
@@ -1023,9 +1103,13 @@ p2 <- ggplot(coeff_long_df, aes(x = type, y = coeff)) +
   theme_bw() +
   theme(
     text = element_text(size = 7.8, hjust = 0.5),
-    legend.position = "none",
+    legend.position = "bottom",
+    legend.margin = margin(t = -10),
+    legend.text = element_text(size = 8),
+    legend.title = element_blank(),
     axis.title.x = element_blank(),
-    axis.text.x  = element_text(hjust = 1),
+    axis.title.y = element_text(size = 10),
+    axis.text.x  = element_text(hjust = 0.5, size = 8),
     axis.text.y  = element_text(size = 5),
     axis.ticks.length = unit(0.05, "cm"),
     axis.ticks.x = element_line(),
@@ -1074,8 +1158,8 @@ df_summary <- result_df %>%
   )
 
 gray_out_data <- data.frame(
-  predictor = c("PSG Top-down", "PSG Left-corner", "PSG Left-corner", "PSG Left-corner", "PSG Top-down", "PSG Left-corner", "CCG-Left", "PSG Top-down", "PSG Left-corner", "CCG-Left", "PSG Left-corner"),
-  dataset = c("Dundee First pass", "Dundee First pass", "Dundee Go-past", "Dundee Total fixation", "Natural Stories", "Natural Stories", "Natural Stories", "OneStop First pass", "OneStop First pass", "OneStop Go-past", "OneStop Total fixation")
+  predictor = c("PSG Top-down", "PSG Left-corner", "PSG Left-corner", "PSG Left-corner", "PSG Left-corner", "CCG-Left", "PSG Left-corner", "PSG Left-corner"),
+  dataset = c("Dundee First pass", "Dundee First pass", "Dundee Go-past", "Dundee Total fixation", "Natural Stories", "Natural Stories", "OneStop First pass", "OneStop Total fixation")
 ) %>%
   mutate(
     predictor = factor(predictor, levels = c(
@@ -1117,6 +1201,8 @@ p <- ggplot(df_summary, aes(x = ndmain)) +
   theme_bw() +
   theme(
     text = element_text(size = 8),
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_text(size = 10),
     legend.position = "none",
     panel.spacing = unit(0.1, "lines"),
     strip.text = element_text(face = "bold")
@@ -1134,9 +1220,9 @@ wt <- tribble(
   "Dundee Go-past",         "--",            "--",             "--",               "-***",       "--",      "--",
   "Dundee Total fixation",  "--",            "--",             "--",               "-***",       "--",      "--",
   "Natural Stories",        "--",            "-*",             "--",               "-***",       "***",     "--",
-  "OneStop First pass",     "--",            "-***",           "--",               "-***",       "--",      "--",
-  "OneStop Go-past",        "-***",          "-*",             "--",               "-***",       "--",      "--",
-  "OneStop Total fixation", "--",            "-**",            "--",               "-***",       "--",      "*"
+  "OneStop First pass",     "--",            "--",             "--",               "-*",         "-***",    "--",
+  "OneStop Go-past",        "-***",          "-*",             "--",               "-**",        "--",      "--",
+  "OneStop Total fixation", "--",            "-**",            "--",               "--",         "-***",    "--"
 )
 
 wt1 <- tribble(
@@ -1145,9 +1231,9 @@ wt1 <- tribble(
   "Dundee Go-past",         "--",            "-**",            "--",               "--",         "--",      "--",
   "Dundee Total fixation",  "--",            "--",             "--",               "-**",        "--",      "--",
   "Natural Stories",        "--",            "--",             "--",               "-*",         "***",     "--",
-  "OneStop First pass",     "--",            "--",             "--",               "-*",         "--",      "--",
-  "OneStop Go-past",        "-*",            "-***",           "--",               "-**",        "--",      "--",
-  "OneStop Total fixation", "--",            "-*",             "--",               "-***",       "--",      "--"
+  "OneStop First pass",     "--",            "--",             "--",               "-***",       "--",      "--",
+  "OneStop Go-past",        "--",            "--",             "--",               "--",         "--",      "--",
+  "OneStop Total fixation", "--",            "--",             "--",               "-***",       "--",      "--"
 )
 
 wt2 <- tribble(
@@ -1156,9 +1242,9 @@ wt2 <- tribble(
   "Dundee Go-past",         "--",            "***",          "--",               "--",         "--",      "--",
   "Dundee Total fixation",  "--",            "--",           "--",               "--",         "***",     "--",
   "Natural Stories",        "--",            "--",           "--",               "--",         "***",     "--",
-  "OneStop First pass",     "--",            "***",          "--",               "--",         "--",      "--",
-  "OneStop Go-past",        "--",            "--",           "--",               "--",         "--",      "--",
-  "OneStop Total fixation", "--",            "--",           "--",               "-***",       "***",     "-*"
+  "OneStop First pass",     "--",            "--",           "--",               "-*",         "***",     "--",
+  "OneStop Go-past",        "--",            "-*",           "--",               "--",         "--",      "--",
+  "OneStop Total fixation", "--",            "--",           "--",               "--",         "***",     "--"
 )
 
 ds_levels   <- c(
@@ -1235,7 +1321,9 @@ p <- ggplot(df_long, aes(x = region, y = 1)) +
   ) +
   scale_shape_manual(
     values = c(pos = 24, neg = 25),
-    name   = "Sign"
+    breaks = c("pos", "neg"),
+    labels = c(pos = "Positive", neg = "Negative"),
+    name   = ""
   ) +
   scale_x_discrete(
     drop = FALSE,
@@ -1249,6 +1337,10 @@ p <- ggplot(df_long, aes(x = region, y = 1)) +
   scale_y_continuous(
     limits = c(1 - tile_h/2, 1 + tile_h/2),
     expand = c(0, 0)
+  ) +
+  guides(
+    fill = "none",
+    shape = guide_legend(override.aes = list(fill = "white")) 
   ) +
   theme_bw(base_size = 8) +
   theme(
@@ -1270,7 +1362,9 @@ p <- ggplot(df_long, aes(x = region, y = 1)) +
     
     panel.grid    = element_blank(),
     panel.spacing = unit(0.02, "lines"),
-    legend.position = "none"
+    legend.position = "bottom",
+    legend.margin = margin(t = -8),
+    legend.text = element_text(size = 8),
   )
 
 ggsave("../result/pdf/Figure_12.pdf", p, device = "pdf", width = 6, height = 3, units = "in", bg = "transparent")

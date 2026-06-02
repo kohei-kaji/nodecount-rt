@@ -3,7 +3,7 @@ mean_RT ~ zone + position + wlen * unigram + wlen_so1 * unigram_so1 +
     wlen_so2 * unigram_so2 + dep_nc + dep_nc_so1 + dep_nc_so2 + 
     bottomup_nc + bottomup_nc_so1 + bottomup_nc_so2 + ccgright_reduce + 
     ccgright_reduce_so1 + ccgright_reduce_so2
-<environment: 0x11c18d590>
+<environment: 0x1527df908>
 
 Call:
 lm(formula = best_formula, data = test)
@@ -46,7 +46,7 @@ Dundee First pass
 mean_RT ~ zone + position + wlen * unigram + wlen_so1 * unigram_so1 + 
     wlen_so2 * unigram_so2 + ccgleft_reduce + ccgleft_reduce_so1 + 
     ccgleft_reduce_so2
-<environment: 0x11d979408>
+<environment: 0x131f08c00>
 
 Call:
 lm(formula = best_formula, data = test)
@@ -83,7 +83,7 @@ Dundee Go-past
 mean_RT ~ zone + position + wlen * unigram + wlen_so1 * unigram_so1 + 
     wlen_so2 * unigram_so2 + bottomup_nc + bottomup_nc_so1 + 
     bottomup_nc_so2 + dep_nc + dep_nc_so1 + dep_nc_so2
-<environment: 0x11db0ecc0>
+<environment: 0x11f11cf28>
 
 Call:
 lm(formula = best_formula, data = test)
@@ -123,7 +123,7 @@ Dundee Total fixation
 mean_RT ~ zone + position + wlen * unigram + wlen_so1 * unigram_so1 + 
     wlen_so2 * unigram_so2 + dep_nc + dep_nc_so1 + dep_nc_so2 + 
     ccgright_reduce + ccgright_reduce_so1 + ccgright_reduce_so2
-<environment: 0x1040a5f18>
+<environment: 0x1311d9c38>
 
 Call:
 lm(formula = best_formula, data = test)
@@ -161,137 +161,133 @@ F-statistic:   410 on 17 and 18614 DF,  p-value: < 2.2e-16
 
 OneStop First pass
 mean_RT ~ zone + position + wlen * unigram + wlen_so1 * unigram_so1 + 
-    wlen_so2 * unigram_so2 + bottomup_nc + bottomup_nc_so1 + 
-    bottomup_nc_so2 + dep_nc + dep_nc_so1 + dep_nc_so2
-<environment: 0x104413028>
+    wlen_so2 * unigram_so2 + dep_nc + dep_nc_so1 + dep_nc_so2 + 
+    ccgright_reduce + ccgright_reduce_so1 + ccgright_reduce_so2
+<environment: 0x11f12a4e0>
 
 Call:
 lm(formula = best_formula, data = test)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--166.08  -16.17   -0.78   15.42  465.65 
+-157.65  -22.03   -2.59   19.34  423.77 
 
 Coefficients:
-                     Estimate Std. Error t value Pr(>|t|)    
-(Intercept)          194.0459     0.3166 612.941  < 2e-16 ***
-zone                  -1.1128     0.2304  -4.830 1.38e-06 ***
-position               0.7828     0.2378   3.292 0.000998 ***
-wlen                   1.4159     0.3326   4.257 2.08e-05 ***
-unigram               -4.7614     0.3410 -13.962  < 2e-16 ***
-wlen_so1              -0.3813     0.2659  -1.434 0.151548    
-unigram_so1            0.9634     0.2967   3.247 0.001168 ** 
-wlen_so2               1.0733     0.2607   4.118 3.85e-05 ***
-unigram_so2            0.2713     0.2926   0.927 0.353819    
-bottomup_nc           -0.9412     0.2468  -3.814 0.000137 ***
-bottomup_nc_so1       -0.1307     0.2555  -0.511 0.609038    
-bottomup_nc_so2        1.3862     0.2724   5.089 3.64e-07 ***
-dep_nc                -1.3354     0.2830  -4.719 2.39e-06 ***
-dep_nc_so1            -0.7714     0.3040  -2.538 0.011170 *  
-dep_nc_so2            -0.2152     0.2887  -0.745 0.456000    
-wlen:unigram           1.7302     0.2655   6.517 7.39e-11 ***
-wlen_so1:unigram_so1   0.1525     0.2267   0.673 0.501064    
-wlen_so2:unigram_so2  -0.1660     0.2286  -0.726 0.467644    
+                      Estimate Std. Error t value Pr(>|t|)    
+(Intercept)          207.24167    0.39120 529.765  < 2e-16 ***
+zone                  -0.43235    0.30865  -1.401  0.16130    
+position               0.13777    0.30705   0.449  0.65367    
+wlen                  11.22210    0.40202  27.914  < 2e-16 ***
+unigram                7.12828    0.48592  14.670  < 2e-16 ***
+wlen_so1              -1.59858    0.40687  -3.929 8.57e-05 ***
+unigram_so1            1.20251    0.48469   2.481  0.01311 *  
+wlen_so2               1.02339    0.40472   2.529  0.01146 *  
+unigram_so2            1.53355    0.47080   3.257  0.00113 ** 
+dep_nc                -0.73179    0.34401  -2.127  0.03342 *  
+dep_nc_so1            -1.42303    0.36992  -3.847  0.00012 ***
+dep_nc_so2            -0.79699    0.36201  -2.202  0.02771 *  
+ccgright_reduce       -3.34507    0.32601 -10.261  < 2e-16 ***
+ccgright_reduce_so1   -0.13929    0.34114  -0.408  0.68305    
+ccgright_reduce_so2    3.12860    0.34469   9.076  < 2e-16 ***
+wlen:unigram           2.01845    0.21630   9.332  < 2e-16 ***
+wlen_so1:unigram_so1   0.07032    0.21601   0.326  0.74479    
+wlen_so2:unigram_so2  -0.01422    0.22183  -0.064  0.94890    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 27.51 on 14934 degrees of freedom
-Multiple R-squared:  0.04931,	Adjusted R-squared:  0.04822 
-F-statistic: 45.56 on 17 and 14934 DF,  p-value: < 2.2e-16
+Residual standard error: 35.61 on 14285 degrees of freedom
+Multiple R-squared:  0.2286,	Adjusted R-squared:  0.2277 
+F-statistic:   249 on 17 and 14285 DF,  p-value: < 2.2e-16
 
 OneStop Go-past
 mean_RT ~ zone + position + wlen * unigram + wlen_so1 * unigram_so1 + 
     wlen_so2 * unigram_so2 + topdown_nc + topdown_nc_so1 + topdown_nc_so2 + 
     bottomup_nc + bottomup_nc_so1 + bottomup_nc_so2 + dep_nc + 
-    dep_nc_so1 + dep_nc_so2
-<environment: 0x128441178>
+    dep_nc_so1 + dep_nc_so2 + ccgright_reduce + ccgright_reduce_so1 + 
+    ccgright_reduce_so2
+<environment: 0x1310df200>
 
 Call:
 lm(formula = best_formula, data = test)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--295.78  -61.86  -14.31   45.60 1429.40 
+-294.26  -60.62  -13.83   44.99 1597.34 
 
 Coefficients:
                      Estimate Std. Error t value Pr(>|t|)    
-(Intercept)          308.8844     1.0726 287.982  < 2e-16 ***
-zone                   3.7829     0.7812   4.842 1.30e-06 ***
-position               8.7776     0.8099  10.838  < 2e-16 ***
-wlen                  14.3836     1.1266  12.767  < 2e-16 ***
-unigram               -6.5579     1.1628  -5.640 1.73e-08 ***
-wlen_so1              -3.2376     0.9016  -3.591  0.00033 ***
-unigram_so1           -3.1274     1.0134  -3.086  0.00203 ** 
-wlen_so2              -1.5065     0.8870  -1.699  0.08943 .  
-unigram_so2           -1.7134     1.0049  -1.705  0.08820 .  
-topdown_nc            -3.3875     0.8340  -4.061 4.90e-05 ***
-topdown_nc_so1        -1.9500     0.8506  -2.293  0.02189 *  
-topdown_nc_so2        -0.2384     0.8322  -0.287  0.77447    
-bottomup_nc           -2.0620     0.8372  -2.463  0.01379 *  
-bottomup_nc_so1       -4.4029     0.8723  -5.047 4.53e-07 ***
-bottomup_nc_so2        0.4665     0.9408   0.496  0.62000    
-dep_nc                -8.1124     0.9652  -8.405  < 2e-16 ***
-dep_nc_so1            -3.2222     1.0597  -3.041  0.00237 ** 
-dep_nc_so2            -0.6258     1.0177  -0.615  0.53862    
-wlen:unigram           1.7145     0.8998   1.905  0.05675 .  
-wlen_so1:unigram_so1   3.1109     0.7689   4.046 5.23e-05 ***
-wlen_so2:unigram_so2   0.9877     0.7747   1.275  0.20237    
+(Intercept)          305.3416     1.0187 299.729  < 2e-16 ***
+zone                   2.7141     0.8054   3.370 0.000753 ***
+position               7.8328     0.8067   9.710  < 2e-16 ***
+wlen                   9.2623     1.0559   8.772  < 2e-16 ***
+unigram               11.3638     1.2815   8.867  < 2e-16 ***
+wlen_so1              -7.1031     1.0551  -6.732 1.73e-11 ***
+unigram_so1            6.8832     1.2626   5.452 5.07e-08 ***
+wlen_so2              -3.5969     1.0711  -3.358 0.000786 ***
+unigram_so2            4.9189     1.2445   3.953 7.77e-05 ***
+topdown_nc            -4.7454     0.8751  -5.422 5.97e-08 ***
+topdown_nc_so1        -1.4286     0.9322  -1.532 0.125430    
+topdown_nc_so2        -0.7759     0.8876  -0.874 0.382094    
+bottomup_nc           -3.0995     1.4089  -2.200 0.027828 *  
+bottomup_nc_so1       -2.8268     1.6251  -1.739 0.081975 .  
+bottomup_nc_so2       -4.8472     2.0273  -2.391 0.016816 *  
+dep_nc                -2.5134     0.8980  -2.799 0.005133 ** 
+dep_nc_so1            -0.8953     0.9862  -0.908 0.363950    
+dep_nc_so2            -0.2069     0.9751  -0.212 0.831985    
+ccgright_reduce       -2.0932     1.5246  -1.373 0.169770    
+ccgright_reduce_so1   -1.7099     1.7053  -1.003 0.316038    
+ccgright_reduce_so2    3.9718     2.1252   1.869 0.061653 .  
+wlen:unigram           3.6791     0.5762   6.385 1.77e-10 ***
+wlen_so1:unigram_so1  -0.3402     0.5602  -0.607 0.543700    
+wlen_so2:unigram_so2  -0.9360     0.5814  -1.610 0.107408    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 93.16 on 14931 degrees of freedom
-Multiple R-squared:  0.05025,	Adjusted R-squared:  0.04897 
-F-statistic:  39.5 on 20 and 14931 DF,  p-value: < 2.2e-16
+Residual standard error: 92.78 on 14279 degrees of freedom
+Multiple R-squared:  0.0711,	Adjusted R-squared:  0.0696 
+F-statistic: 47.52 on 23 and 14279 DF,  p-value: < 2.2e-16
 
 OneStop Total fixation
 mean_RT ~ zone + position + wlen * unigram + wlen_so1 * unigram_so1 + 
-    wlen_so2 * unigram_so2 + topdown_nc + topdown_nc_so1 + topdown_nc_so2 + 
-    bottomup_nc + bottomup_nc_so1 + bottomup_nc_so2 + dep_nc + 
-    dep_nc_so1 + dep_nc_so2 + ccgright_reduce + ccgright_reduce_so1 + 
-    ccgright_reduce_so2 + ccgleft_reduce + ccgleft_reduce_so1 + 
-    ccgleft_reduce_so2
-<environment: 0x12953f668>
+    wlen_so2 * unigram_so2 + bottomup_nc + bottomup_nc_so1 + 
+    bottomup_nc_so2 + dep_nc + dep_nc_so1 + dep_nc_so2 + ccgright_reduce + 
+    ccgright_reduce_so1 + ccgright_reduce_so2
+<environment: 0x1525f7d28>
 
 Call:
 lm(formula = best_formula, data = test)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--265.96  -47.90   -8.50   37.85 1494.71 
+-341.29  -49.81   -9.41   38.37  687.23 
 
 Coefficients:
-                     Estimate Std. Error t value Pr(>|t|)    
-(Intercept)          294.5888     0.8649 340.619  < 2e-16 ***
-zone                 -14.4124     0.6289 -22.918  < 2e-16 ***
-position               1.6070     0.6539   2.458 0.014001 *  
-wlen                  42.6814     0.9084  46.984  < 2e-16 ***
-unigram              -10.5485     0.9393 -11.230  < 2e-16 ***
-wlen_so1              -4.1178     0.7438  -5.536 3.14e-08 ***
-unigram_so1           -2.7919     0.8396  -3.325 0.000885 ***
-wlen_so2               2.1998     0.7356   2.991 0.002788 ** 
-unigram_so2           -1.0758     0.8391  -1.282 0.199866    
-topdown_nc             0.4860     0.7045   0.690 0.490294    
-topdown_nc_so1        -0.2733     0.7217  -0.379 0.704913    
-topdown_nc_so2        -0.3349     0.7104  -0.471 0.637386    
-bottomup_nc           -2.8289     1.0089  -2.804 0.005052 ** 
-bottomup_nc_so1       -2.6029     1.2292  -2.118 0.034230 *  
-bottomup_nc_so2        1.8125     1.5096   1.201 0.229922    
-dep_nc                -5.6442     0.8085  -6.981 3.06e-12 ***
-dep_nc_so1            -3.5374     0.8638  -4.095 4.24e-05 ***
-dep_nc_so2            -3.9588     0.8297  -4.771 1.85e-06 ***
-ccgright_reduce       -2.1108     1.3592  -1.553 0.120454    
-ccgright_reduce_so1    2.5118     1.8130   1.385 0.165949    
-ccgright_reduce_so2    8.3953     2.2674   3.703 0.000214 ***
-ccgleft_reduce         2.1268     1.0543   2.017 0.043682 *  
-ccgleft_reduce_so1    -0.2815     1.4327  -0.196 0.844222    
-ccgleft_reduce_so2    -4.3593     1.7794  -2.450 0.014300 *  
-wlen:unigram           8.2196     0.7244  11.347  < 2e-16 ***
-wlen_so1:unigram_so1   4.0119     0.6244   6.425 1.35e-10 ***
-wlen_so2:unigram_so2   0.8704     0.6278   1.386 0.165636    
+                      Estimate Std. Error t value Pr(>|t|)    
+(Intercept)          290.13025    0.84983 341.397  < 2e-16 ***
+zone                  -0.81788    0.67080  -1.219 0.222767    
+position              -2.15357    0.66822  -3.223 0.001272 ** 
+wlen                  33.05712    0.87406  37.820  < 2e-16 ***
+unigram               21.80704    1.06167  20.540  < 2e-16 ***
+wlen_so1              -6.15069    0.88533  -6.947 3.88e-12 ***
+unigram_so1            8.17158    1.05717   7.730 1.15e-14 ***
+wlen_so2              -0.80537    0.87992  -0.915 0.360063    
+unigram_so2            5.71863    1.02482   5.580 2.45e-08 ***
+bottomup_nc           -3.33367    1.18302  -2.818 0.004840 ** 
+bottomup_nc_so1       -0.19806    1.30154  -0.152 0.879052    
+bottomup_nc_so2       -2.14424    1.62631  -1.318 0.187368    
+dep_nc                -1.29972    0.74846  -1.737 0.082493 .  
+dep_nc_so1            -3.26217    0.80830  -4.036 5.47e-05 ***
+dep_nc_so2            -1.10750    0.79325  -1.396 0.162689    
+ccgright_reduce       -5.91979    1.19860  -4.939 7.94e-07 ***
+ccgright_reduce_so1   -1.26249    1.32452  -0.953 0.340521    
+ccgright_reduce_so2    6.27756    1.66507   3.770 0.000164 ***
+wlen:unigram          -0.07752    0.47004  -0.165 0.869014    
+wlen_so1:unigram_so1  -1.41851    0.46966  -3.020 0.002530 ** 
+wlen_so2:unigram_so2  -0.75729    0.48224  -1.570 0.116353    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 74.95 on 14925 degrees of freedom
-Multiple R-squared:  0.3087,	Adjusted R-squared:  0.3075 
-F-statistic: 256.4 on 26 and 14925 DF,  p-value: < 2.2e-16
+Residual standard error: 77.36 on 14282 degrees of freedom
+Multiple R-squared:  0.2955,	Adjusted R-squared:  0.2945 
+F-statistic: 299.5 on 20 and 14282 DF,  p-value: < 2.2e-16
 
